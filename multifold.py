@@ -2,7 +2,7 @@ from collections import deque, namedtuple
 from sys import exit
 import csv
 import toolz
-import pytest
+import pytest 
 
 Element = namedtuple('Element', 'date values')
 
