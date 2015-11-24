@@ -1,8 +1,23 @@
 from collections import deque, namedtuple
 from sys import exit
-
+import csv
+import toolz
+import pytest
 
 Element = namedtuple('Element', 'date values')
+
+def dotprod(x, y, f=lambda x, y: x*y, default_value = 0):
+    """ A generic scalar product between two dictionaries with numerical values.
+
+    Keyword arguments:
+        x -- a dictionary with numerical values
+        y -- a dictionary with numerical values
+        f -- function of two scalars returning a scalar
+        default_value -- value used in absence of a value.
+
+        Returns a scalar.
+    """
+    return(sum(f(x[n], y.get(n, default_value)) for n in x.keys()))
 
 
 def get_dates(x):
@@ -35,6 +50,10 @@ def compute_gmv(x):
 
 
 def rescale_state(h_old, r, h_new):
+    """ Rescales the gmv of h_old to match that of h_new.
+
+    Applies returns to h_old and then multiplies it by a scalar to
+    """
     h_old = update_state(h_old, r)
     rescale_factor = compute_gmv(h_old) / compute_gmv(h_new)
     return({k: rescale_factor * v for k, v in h_new.items()})
@@ -101,17 +120,13 @@ def compute_returns(holdings):
         yield({'date': PORT[new].date, 'pnl': pnl, 'gmv': gmv, 'ret': pnl/gmv})
 
 
-def reader(fname, sep=','):
+def reader(fname, sep=',', na='NA'):
     with open(fname, 'r') as f:
         line = next(f)
-        id_names = [x.strip() for x in line.split(sep)]
-        num_names = len(id_names)
+        id_names = [x.strip('"') for x in line.split(sep)]
+        num_names = len(id_names) - 1
         for line in f:
             x = line.split(sep)
-            d = x[0].strip()
-            v = {id_names[i]: float(x[1+i]) for i in range(num_names)}
+            d = x[0].strip('"')  # date
+            v = {id_names[i]: float(x[1+i]) for i in range(num_names) if x[i+1] != 'NA'}
             yield Element(date=d, values=v)
-
-
-if __name__ == '__main__':
-    print(0)
