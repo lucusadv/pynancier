@@ -1,7 +1,5 @@
-#
-# Grammar of graphic for dictionaries.
-# This is supposed to be much slower than pandas, but more
-# flexible and portable
+# Grammar of data for dictionaries.
+# This is supposed to be much slower than pandas, but more flexible and portable
 from toolz import groupby
 from operator import itemgetter
 import re
